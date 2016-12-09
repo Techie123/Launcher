@@ -29,14 +29,14 @@
     <Folder Include="$(MSBuildThisFileDirectory)Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)Data\header-illidan.webm" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="$(MSBuildThisFileDirectory)index.html">
       <LogicalName>Launcher.index.html</LogicalName>
     </EmbeddedResource>
     <EmbeddedResource Include="$(MSBuildThisFileDirectory)Resources\Settings.png">
       <LogicalName>Launcher.Resources.Settings.png</LogicalName>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)Data\header-illidan.mp4" />
   </ItemGroup>
 </Project>

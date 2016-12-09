@@ -12,7 +12,7 @@ namespace Launcher.Windows
             Global.Windows = true;
             Global.Is64bit = Environment.Is64BitOperatingSystem;
 
-			var app = new Application(Platforms.Wpf);
+            var app = new Application(Platform.Detect);
             var win = new MainWindow();
             Controller.Attach(win);
 
