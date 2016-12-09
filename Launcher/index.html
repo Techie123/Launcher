@@ -1,22 +1,29 @@
 ﻿<!DOCTYPE html>
 <html>
 	<head>
+        <meta http-equiv='Content-Type' content='text/html; charset=unicode' />
+        <meta http-equiv='X-UA-Compatible' content='IE=11' /> 
 		<title>HSMod Launcher</title>
 		<style type="text/css">
+			body
+			{
+				background: black;
+			}
+			
 			video
 			{
 			    position: fixed;
-			    top: 50%;
+			    top: 0%;
 			    left: 50%;
 			    min-width: 100%;
 			    min-height: 100%;
 			    width: auto;
 			    height: auto;
 			    z-index: -100;
-			    transform: translateX(-50%) translateY(-50%);
-			    -webkit-transform: translate(-50%, -50%);
-			    -moz-transform: translate(-50%, -50%);
-			    -ms-transform: translate(-50%, -50%);
+			    transform: translateX(-50%) translateY(0%);
+			    -webkit-transform: translate(-50%, 0%);
+			    -moz-transform: translate(-50%, 0%);
+			    -ms-transform: translate(-50%, 0%);
 			}
 
 			#textarea
@@ -25,7 +32,7 @@
 				top: 10px;
 				left: 10px;
 				right: 10px;
-				bottom: 100px;
+				bottom: 10px;
 			
 				background: transparent;
 				overflow-y: scroll;
@@ -44,7 +51,7 @@
 	</head>
 	<body>
 		<video autoplay="" loop="">
-			<source src="Data/header-illidan.webm" type="video/webm" />
+			<source src="Data/header-illidan.mp4" type="video/mp4" />
 		</video>
 		<div id="textarea" readonly>
 			$CHANGELOG

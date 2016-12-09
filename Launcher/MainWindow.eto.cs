@@ -6,7 +6,7 @@ namespace Launcher
 {
     public partial class MainWindow : Form
     {
-        private PixelLayout _pixel1;
+		private DynamicLayout _layout1;
         private WebView _webview1;
         private Label _label1;
         private ProgressBar _progress1;
@@ -20,21 +20,18 @@ namespace Launcher
             Height = 500;
             Resizable = false;
 
-            _pixel1 = new PixelLayout();
-            _pixel1.Width = Width;
-            _pixel1.Height = Height;
+			_layout1 = new DynamicLayout();
 
             // Background web view
             _webview1 = new WebView();
             _webview1.Width = Width;
             _webview1.Height = Height;
-            _pixel1.Add(_webview1, 0, 0);
+			_layout1.Add(_webview1, true, true);
 
             // Foreground controls
             var center1 = new CenterControl();
             center1.DefaultPadding = new Padding(5);
             center1.Width = Width;
-            center1.Height = 100;
 
             var dynamic1 = new DynamicLayout();
             dynamic1.DefaultSpacing = new Size(10, 0);
@@ -45,7 +42,6 @@ namespace Launcher
             center2.DefaultSpacing = new Size(0, 5);
             _label1 = new Label();
             _label1.Text = "Ready";
-            _label1.TextColor = Colors.White;
             center2.Add(_label1);
             _progress1 = new ProgressBar();
             _progress1.MinValue = 0;
@@ -88,9 +84,9 @@ namespace Launcher
             center1.Add(dynamic1);
 
             center1.Finish();
-            _pixel1.Add(center1, 0, 395);
+			_layout1.Add(center1, true, false);
 
-            Content = _pixel1;
+            Content = _layout1;
         }
     }
 }

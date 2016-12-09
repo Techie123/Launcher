@@ -1,19 +1,42 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Launcher", "Launcher\Launcher.shproj", "{89490CA4-0CE2-4D4F-A782-149C6A729179}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Launcher.Linux", "Launcher.Linux\Launcher.Linux.csproj", "{59399BB1-CBFE-4DC5-86EE-C7DC637D0BF1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Launcher.Windows", "Launcher.Windows\Launcher.Windows.csproj", "{F7D81DFA-A25C-4463-A15C-923F905CF77E}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Launcher\Launcher.projitems*{59399bb1-cbfe-4dc5-86ee-c7dc637d0bf1}*SharedItemsImports = 4
+		Launcher\Launcher.projitems*{89490ca4-0ce2-4d4f-a782-149c6a729179}*SharedItemsImports = 13
+		Launcher\Launcher.projitems*{f7d81dfa-a25c-4463-a15c-923f905cf77e}*SharedItemsImports = 4
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
 		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{59399BB1-CBFE-4DC5-86EE-C7DC637D0BF1}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{59399BB1-CBFE-4DC5-86EE-C7DC637D0BF1}.Debug|x86.ActiveCfg = Debug|x86
 		{59399BB1-CBFE-4DC5-86EE-C7DC637D0BF1}.Debug|x86.Build.0 = Debug|x86
+		{59399BB1-CBFE-4DC5-86EE-C7DC637D0BF1}.Release|Any CPU.ActiveCfg = Release|x86
 		{59399BB1-CBFE-4DC5-86EE-C7DC637D0BF1}.Release|x86.ActiveCfg = Release|x86
 		{59399BB1-CBFE-4DC5-86EE-C7DC637D0BF1}.Release|x86.Build.0 = Release|x86
+		{F7D81DFA-A25C-4463-A15C-923F905CF77E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7D81DFA-A25C-4463-A15C-923F905CF77E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7D81DFA-A25C-4463-A15C-923F905CF77E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F7D81DFA-A25C-4463-A15C-923F905CF77E}.Debug|x86.Build.0 = Debug|Any CPU
+		{F7D81DFA-A25C-4463-A15C-923F905CF77E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7D81DFA-A25C-4463-A15C-923F905CF77E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7D81DFA-A25C-4463-A15C-923F905CF77E}.Release|x86.ActiveCfg = Release|Any CPU
+		{F7D81DFA-A25C-4463-A15C-923F905CF77E}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal
