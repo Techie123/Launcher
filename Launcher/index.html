@@ -1,0 +1,53 @@
+﻿<!DOCTYPE html>
+<html>
+	<head>
+		<title>HSMod Launcher</title>
+		<style type="text/css">
+			video
+			{
+			    position: fixed;
+			    top: 50%;
+			    left: 50%;
+			    min-width: 100%;
+			    min-height: 100%;
+			    width: auto;
+			    height: auto;
+			    z-index: -100;
+			    transform: translateX(-50%) translateY(-50%);
+			    -webkit-transform: translate(-50%, -50%);
+			    -moz-transform: translate(-50%, -50%);
+			    -ms-transform: translate(-50%, -50%);
+			}
+
+			#textarea
+			{
+			    position: fixed;
+				top: 10px;
+				left: 10px;
+				right: 10px;
+				bottom: 100px;
+			
+				background: transparent;
+				overflow-y: scroll;
+				color: white;
+				resize: none;
+				border: 0 none;
+				outline: none;
+			}
+
+			img
+			{
+				width: 50%;
+				height: auto;
+			}
+		</style>
+	</head>
+	<body>
+		<video autoplay="" loop="">
+			<source src="Data/header-illidan.webm" type="video/webm" />
+		</video>
+		<div id="textarea" readonly>
+			$CHANGELOG
+		</div>
+	</body>
+</html>

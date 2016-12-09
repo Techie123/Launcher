@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>{89490CA4-0CE2-4D4F-A782-149C6A729179}</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Launcher</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)MainWindow.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MainWindow.eto.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\VersionInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\CenterControl.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Properties\AssemblyInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\ProgressionStream.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\Controller.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\IView.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\Status.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\PlayMode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\Global.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Common\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Controls\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Data\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Resources\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)Data\header-illidan.webm" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)index.html">
+      <LogicalName>Launcher.index.html</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)Resources\Settings.png">
+      <LogicalName>Launcher.Resources.Settings.png</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>
