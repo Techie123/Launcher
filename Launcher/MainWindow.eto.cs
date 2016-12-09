@@ -30,7 +30,7 @@ namespace Launcher
 
             // Foreground controls
             var center1 = new CenterControl();
-            center1.DefaultPadding = new Padding(5);
+            center1.DefaultPadding = new Padding(4);
             center1.Width = Width;
 
             var dynamic1 = new DynamicLayout();
@@ -39,7 +39,6 @@ namespace Launcher
 
             // Downloading section
             var center2 = new CenterControl();
-            center2.DefaultSpacing = new Size(0, 5);
             _label1 = new Label();
             _label1.Text = "Ready";
             center2.Add(_label1);
@@ -53,7 +52,6 @@ namespace Launcher
 
             // Play section
             var center3 = new CenterControl();
-            center3.DefaultSpacing = new Size(0, 5);
 
             var hbox = new DynamicLayout();
             hbox.DefaultSpacing = new Size(4, 0);
@@ -84,7 +82,7 @@ namespace Launcher
             center1.Add(dynamic1);
 
             center1.Finish();
-			_layout1.Add(center1, true, false);
+			//_layout1.Add(center1, true, false);
 
             Content = _layout1;
         }
