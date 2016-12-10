@@ -10,18 +10,12 @@ namespace Launcher
         public MainWindow()
         {
             CreateContent();
+
         }
 
-        public void Attach(string changelog, VersionInfo[] versions)
+        public void Attach(string html, string changelog, VersionInfo[] versions)
         {
-            var html = "";
-            var assembly = typeof(MainWindow).GetTypeInfo().Assembly;
-
-            using (var stream = assembly.GetManifestResourceStream("Launcher.index.html"))
-                using (var reader = new StreamReader(stream))
-                    html = reader.ReadToEnd();
-
-            _webview1.LoadHtml(html.Replace("$CHANGELOG", changelog), new Uri("file://" + AppDomain.CurrentDomain.BaseDirectory));
+            _webview1.LoadHtml(html, new Uri("file://" + AppDomain.CurrentDomain.BaseDirectory));
 
             _combo1.Items.Clear();
             _combo1.Items.Add("Latest");
@@ -29,8 +23,15 @@ namespace Launcher
                 _combo1.Items.Add(version.Version);
             _combo1.SelectedIndex = 0;
 
-            _combo1.SelectedIndexChanged += (sender, e) => Controller.SetSelectedVersion(_combo1.SelectedIndex == 0 ? 0 : _combo1.SelectedIndex - 1);
-            _buttonPlay.Click += (sender, e) => Controller.PlayActivated();
+            _webview1.DocumentTitleChanged += _webview1_DocumentTitleChanged;
+        }
+
+        private void _webview1_DocumentTitleChanged(object sender, WebViewTitleEventArgs e)
+        {
+            if (e.Title.StartsWith("PlayClicked"))
+                Controller.PlayActivated();
+            /*else if (e.Title == "Hearthstone Mod Launcher")
+                Controller.ViewLoaded();*/
         }
 
         public void Invoke(Action action)
@@ -38,12 +39,9 @@ namespace Launcher
             Application.Instance.Invoke(action);
         }
 
-        public void SetPlayMode(PlayMode mode)
+        public void SetPlayText(string text)
         {
-            if (mode == PlayMode.Play)
-                _buttonPlay.Text = "Play";
-            else if (mode == PlayMode.Install)
-                _buttonPlay.Text = "Install";
+            _webview1.ExecuteScript("document.getElementById('playbutton').innerHTML = '" + text + "'");
         }
 
         public void SetProgress(int progress)
@@ -69,7 +67,7 @@ namespace Launcher
 
         public void SetStatusText(string text)
         {
-            _label1.Text = text;
+            _webview1.ExecuteScript("document.getElementById('statustext').innerHTML = '" + text + "'");
         }
 
         public void ShowError(string message)

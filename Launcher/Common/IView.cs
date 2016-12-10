@@ -4,11 +4,11 @@ namespace Launcher
 {
     public interface IView
     {
-        void Attach(string changelog, VersionInfo[] versions);
+        void Attach(string html, string changelog, VersionInfo[] versions);
 
         void Invoke(Action action);
 
-        void SetPlayMode(PlayMode mode);
+        void SetPlayText(string text);
 
         void SetProgress(int progress);
 

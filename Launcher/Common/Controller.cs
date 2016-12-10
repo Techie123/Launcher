@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
+using System.Reflection;
 using System.Threading.Tasks;
 using CG.Web.MegaApiClient;
 using Newtonsoft.Json;
@@ -30,6 +31,12 @@ namespace Launcher
                 Directory.CreateDirectory(_gamepath);
 
             var changelogtext = "";
+            var html = "";
+            var assembly = typeof(MainWindow).GetTypeInfo().Assembly;
+
+            using (var stream = assembly.GetManifestResourceStream("Launcher.index.html"))
+            using (var reader = new StreamReader(stream))
+                html = reader.ReadToEnd();
 
             try
             {
@@ -78,72 +85,14 @@ namespace Launcher
                 _versions = new VersionInfo[0];
             }
 
-            _view.Attach(changelogtext, _versions);
-
             _status = Status.Ready;
-            _view.SetStatus(_status);
-            _view.SetStatusText("Ready");
-
-            ReloadPlay();
+            ReloadPlay(false);
 
             _currentprogress = 100;
             _index = 0;
-        }
 
-        public static void Install()
-        {
-            try
-            {
-                var filePath = _versions[_index].Linux; ;
-
-                if (Global.Windows && Global.Is64bit)
-                    filePath = _versions[_index].Windows64;
-                else if (Global.Windows && !Global.Is64bit)
-                    filePath = _versions[_index].Windows32;
-
-                _status = Status.Downloading;
-                _view.Invoke(() =>
-                {
-                    _view.SetStatus(_status);
-                    _view.SetProgress(0);
-                    _view.SetStatusText("Preparing...");
-                });
-
-                var client = new MegaApiClient();
-                client.LoginAnonymous();
-
-                var temppath = Path.GetTempPath() + Guid.NewGuid().ToString();
-
-                SetDownloadProgress(0);
-                using (var fileStream = new FileStream(temppath, FileMode.Create))
-                using (var downloadStream = new ProgressionStream(client.Download(new Uri(filePath)), SetDownloadProgress))
-                    downloadStream.CopyTo(fileStream);
-
-                _status = Status.Installing;
-                _view.Invoke(() =>
-                {
-                    _view.SetStatus(_status);
-                    _view.SetStatusText("Installing...");
-                });
-
-                ZipFile.ExtractToDirectory(temppath, Path.Combine(_gamepath, _versions[_index].Version));
-                File.Delete(temppath);
-            }
-            catch
-            {
-                _view.Invoke(() =>
-                {
-                    _view.ShowError("An error occured while trying to install the game.");
-                });
-            }
-
-            _status = Status.Ready;
-            _view.Invoke(() =>
-            {
-                _view.SetStatus(_status);
-                _view.SetStatusText("Ready");
-                ReloadPlay();
-            });
+            html = html.Replace("$PLAYTEXT", _playmode.ToString()).Replace("$CHANGELOG", changelogtext);
+            _view.Attach(html, changelogtext, _versions);
         }
 
         public static void PlayActivated()
@@ -192,6 +141,62 @@ namespace Launcher
             game.Start();
         }
 
+        private static void Install()
+        {
+            try
+            {
+                var url = _versions[_index].Linux;
+
+                if (Global.Windows && Global.Is64bit)
+                    url = _versions[_index].Windows64;
+                else if (Global.Windows && !Global.Is64bit)
+                    url = _versions[_index].Windows32;
+
+                _status = Status.Downloading;
+                _view.Invoke(() =>
+                {
+                    _view.SetStatus(_status);
+                    _view.SetProgress(0);
+                    _view.SetStatusText("Preparing...");
+                });
+
+                var client = new MegaApiClient();
+                client.LoginAnonymous();
+
+                var temppath = Path.GetTempPath() + Guid.NewGuid().ToString();
+
+                SetDownloadProgress(0);
+                using (var fileStream = new FileStream(temppath, FileMode.Create))
+                using (var downloadStream = new ProgressionStream(client.Download(new Uri(url)), SetDownloadProgress))
+                    downloadStream.CopyTo(fileStream);
+
+                _status = Status.Installing;
+                _view.Invoke(() =>
+                {
+                    _view.SetStatus(_status);
+                    _view.SetStatusText("Installing...");
+                });
+
+                ZipFile.ExtractToDirectory(temppath, Path.Combine(_gamepath, _versions[_index].Version));
+                File.Delete(temppath);
+            }
+            catch(Exception ex)
+            {
+                _view.Invoke(() =>
+                {
+                    _view.ShowError("An error occured while trying to install the game. More Info:" + Environment.NewLine + ex);
+                });
+            }
+
+            _status = Status.Ready;
+            _view.Invoke(() =>
+            {
+                _view.SetStatus(_status);
+                _view.SetStatusText("Ready");
+                ReloadPlay();
+            });
+        }
+
         private static void PlayGame(string directory = null)
         {
             if (directory == null)
@@ -229,7 +234,7 @@ namespace Launcher
             Execute(filepath);
         }
 
-        private static void ReloadPlay()
+        private static void ReloadPlay(bool reloadview = true)
         {
             if (_status != Status.Ready)
                 return;
@@ -238,7 +243,9 @@ namespace Launcher
                 _playmode = PlayMode.Play;
             else
                 _playmode = PlayMode.Install;
-            _view.SetPlayMode(_playmode);
+
+            if (reloadview)
+                _view.SetPlayText(_playmode.ToString());
         }
 
         private static void SetDownloadProgress(int progress)
