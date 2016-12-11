@@ -98,7 +98,7 @@ namespace Launcher
             if (_status != Status.Ready)
                 return;
 
-            if (_playmode == PlayMode.Install)
+            if (_playmode == PlayMode.Install || _playmode == PlayMode.Update)
             {
                 var task = new Task(Install);
                 task.Start();
