@@ -20,6 +20,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Common\Status.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\PlayMode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\Global.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\Settings.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)Common\" />

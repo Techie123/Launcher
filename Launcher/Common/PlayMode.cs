@@ -4,6 +4,7 @@ namespace Launcher
     public enum PlayMode
     {
         Play,
-        Install
+        Install,
+        Update
     }
 }

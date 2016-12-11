@@ -27,8 +27,6 @@ namespace Launcher
             _view = view;
 
             _gamepath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, GameLocation);
-            if (!Directory.Exists(_gamepath))
-                Directory.CreateDirectory(_gamepath);
 
             var changelogtext = "";
             var html = "";
@@ -177,6 +175,11 @@ namespace Launcher
                     _view.SetStatusText("Installing...");
                 });
 
+                if (Directory.Exists(_gamepath))
+                    Directory.Delete(_gamepath, true);
+
+                Directory.CreateDirectory(_gamepath);
+                
                 ZipFile.ExtractToDirectory(temppath, Path.Combine(_gamepath, _versions[_index].Version));
                 File.Delete(temppath);
             }
@@ -239,6 +242,8 @@ namespace Launcher
 
             if (Directory.Exists(Path.Combine(_gamepath, _versions[_index].Version)))
                 _playmode = PlayMode.Play;
+            else if (Directory.GetDirectories(_gamepath).Length > 0)
+                _playmode = PlayMode.Update;
             else
                 _playmode = PlayMode.Install;
 
