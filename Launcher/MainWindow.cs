@@ -45,7 +45,7 @@ namespace Launcher
 
         public void SetProgress(int progress)
         {
-            int width = ProgressWidth * 675 / 100;
+            int width = progress * ProgressWidth / 100;
 
             _webview1.ExecuteScript("document.getElementById('progressbar').style.width = '" + width + "px';");
             _webview1.ExecuteScript("document.getElementById('progresstext').innerHTML = '" + progress + "%';");
@@ -56,13 +56,13 @@ namespace Launcher
             switch (status)
             {
                 case Status.Ready:
-                    _buttonPlay.Enabled = true;
-                    _combo1.Enabled = true;
+                    _webview1.ExecuteScript("document.getElementById('playbutton').className = 'button-link';");
+                    _webview1.ExecuteScript("playenabled = true;");
                     break;
                 case Status.Downloading:
                 case Status.Installing:
-                    _buttonPlay.Enabled = false;
-                    _combo1.Enabled = false;
+                    _webview1.ExecuteScript("document.getElementById('playbutton').className = 'button-link-disabled';");
+                    _webview1.ExecuteScript("playenabled = false;");
                     break;
             }
         }

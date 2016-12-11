@@ -6,9 +6,13 @@
 		<title>Hearthstone Mod Launcher</title>
 		<script type="text/javascript" language="javascript">
 			var counter = 0;
+			var playenabled = true;
 			
 			function playclicked()
 			{
+				if (!playenabled)
+					return;
+			
 				counter++;
 				document.title = "PlayClicked" + counter;
 			}
@@ -138,6 +142,46 @@
 				box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.6);
 				background: #005500;
 				border: solid 1px #005600;
+			}
+
+			.button-link-disabled
+			{
+				box-sizing: border-box;
+				display: inline-block;
+				width: 100%;
+				height: 100%;
+				font-size: 22px;
+				line-height: 60px;
+				vertical-align: middle;
+				text-align: center;
+				text-decoration: none;
+				//padding: 10px 15px;
+				background: #004400;
+				color: #FFF;
+				-webkit-border-radius: 4px;
+				-moz-border-radius: 4px;
+				border-radius: 4px;
+				text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.4);
+				-webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
+				-moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
+				box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
+				-webkit-transition-duration: 0.2s;
+				-moz-transition-duration: 0.2s;
+				transition-duration: 0.2s;
+				-webkit-user-select:none;
+				-moz-user-select:none;
+				-ms-user-select:none;
+				user-select:none;
+			
+				cursor: default;
+				background-image: none;
+				opacity: 0.65;
+				filter: alpha(opacity=65);
+				-webkit-box-shadow: none;
+				-moz-box-shadow: none;
+				box-shadow: none;
+				color: #333;
+				background-color: #E6E6E6;
 			}
 			
 			.progressbase
