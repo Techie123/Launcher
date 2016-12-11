@@ -16,6 +16,22 @@
 				counter++;
 				document.title = "PlayClicked" + counter;
 			}
+
+			function setplayenabled(enabled)
+			{
+			    var playbutton = document.getElementById('playbutton');
+			    playenabled = enabled;
+
+                if (enabled)
+			        playbutton.className = 'button-link';
+                else
+                    playbutton.className = 'button-link-disabled';
+
+                // Force redraw in IE
+			    playbutton.style.display = 'none';
+			    playbutton.style.display = 'inline-block';
+			    playbutton.blur();
+			}
 		</script>
 		<style type="text/css">
 			::-webkit-scrollbar
@@ -77,6 +93,14 @@
 				resize: none;
 				border: 0 none;
 				outline: none;
+
+                /* Custom IE scrollbar */
+                scrollbar-base-color: #004400;
+                scrollbar-3dlight-color: #004400;
+                scrollbar-highlight-color: #004400;
+                scrollbar-track-color: rgba(150, 150, 150, 0.8);
+                scrollbar-arrow-color: black;
+                scrollbar-shadow-color: #004400;
 			}
 
 			#buttonarea
@@ -130,7 +154,6 @@
 				vertical-align: middle;
 				text-align: center;
 				text-decoration: none;
-				//padding: 10px 15px;
 				background: #004400;
 				color: #FFF;
 				-webkit-border-radius: 4px;
@@ -177,7 +200,6 @@
 				vertical-align: middle;
 				text-align: center;
 				text-decoration: none;
-				//padding: 10px 15px;
 				background: #004400;
 				color: #FFF;
 				-webkit-border-radius: 4px;
@@ -240,8 +262,9 @@
 				top: 50%;
 				height: 2px;
 				margin-top: -1px;
-				
-				width: 675px;
+                padding-left: -30px;
+                left: 15px;
+                right: 50px;
 				background: white;
 			}
 			

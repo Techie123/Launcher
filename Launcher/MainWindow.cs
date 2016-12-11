@@ -5,7 +5,8 @@ namespace Launcher
 {
     public partial class MainWindow : Form, IView
     {
-        private const int ProgressWidth = 675;
+        private static int ProgressWidth = -1;
+        private static int Right = -1;
 
         public MainWindow()
         {
@@ -43,9 +44,15 @@ namespace Launcher
 
         public void SetProgress(int progress)
         {
-            int width = progress * ProgressWidth / 100;
+            if (ProgressWidth == -1)
+            {
+                ProgressWidth = int.Parse(_webview1.ExecuteScript("return document.getElementById('progressbar').offsetWidth;"));
+                Right = 50;
+            }
 
-            _webview1.ExecuteScript("document.getElementById('progressbar').style.width = '" + width + "px';");
+            int right = (ProgressWidth - (progress * ProgressWidth / 100)) + Right;
+
+            _webview1.ExecuteScript("document.getElementById('progressbar').style.right = '" + right + "px';");
             _webview1.ExecuteScript("document.getElementById('progresstext').innerHTML = '" + progress + "%';");
         }
 
@@ -54,13 +61,11 @@ namespace Launcher
             switch (status)
             {
                 case Status.Ready:
-                    _webview1.ExecuteScript("document.getElementById('playbutton').className = 'button-link';");
-                    _webview1.ExecuteScript("playenabled = true;");
+                    _webview1.ExecuteScript("setplayenabled(true);");
                     break;
                 case Status.Downloading:
                 case Status.Installing:
-                    _webview1.ExecuteScript("document.getElementById('playbutton').className = 'button-link-disabled';");
-                    _webview1.ExecuteScript("playenabled = false;");
+                    _webview1.ExecuteScript("setplayenabled(false)");
                     break;
             }
         }
