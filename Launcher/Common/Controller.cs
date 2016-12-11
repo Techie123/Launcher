@@ -165,7 +165,7 @@ namespace Launcher
 
                 var temppath = Path.GetTempPath() + Guid.NewGuid().ToString();
 
-                SetDownloadProgress(0);
+                _view.Invoke(() => _view.SetStatusText("Downloading..."));
                 using (var fileStream = new FileStream(temppath, FileMode.Create))
                 using (var downloadStream = new ProgressionStream(client.Download(new Uri(url)), SetDownloadProgress))
                     downloadStream.CopyTo(fileStream);
@@ -182,10 +182,8 @@ namespace Launcher
             }
             catch(Exception ex)
             {
-                _view.Invoke(() =>
-                {
-                    _view.ShowError("An error occured while trying to install the game. More Info:" + Environment.NewLine + ex);
-                });
+                _view.Invoke(() => _view.ShowError("An error occured while trying to install the game. More Info:" + Environment.NewLine + ex));
+                SetDownloadProgress(100);
             }
 
             _status = Status.Ready;
@@ -253,11 +251,7 @@ namespace Launcher
             if (_currentprogress != progress)
             {
                 _currentprogress = progress;
-                _view.Invoke(() =>
-                {
-                    _view.SetStatusText("Downloading... (" + progress + "%)");
-                    _view.SetProgress(progress);
-                });
+                _view.Invoke(() => _view.SetProgress(progress));
             }
         }
     }

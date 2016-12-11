@@ -145,10 +145,9 @@
 				width: 100%;
 				height: 30px;
 				margin-top: 4px;
+				position: relative;
 				
 				box-sizing: border-box;
-				text-align: center;
-				text-decoration: none;
 				padding: 10px 15px;
 				background: rgba(0, 0, 0, 0.6);
 				color: #FFF;
@@ -169,9 +168,29 @@
 				user-select:none;
 			}
 			
-			table, tr, td
+			#progressbar
 			{
-				//border: 1px solid black;
+				position: absolute;
+				top: 50%;
+				height: 2px;
+				margin-top: -1px;
+				
+				width: 675px;
+				background: white;
+			}
+			
+			#progresstext
+			{
+				position: absolute;
+				right: 10px;
+				font-size: 12px;
+				top: 50%;
+				margin-top: -8px;
+			}
+
+			#statustext
+			{
+				font-size: 12px;
 			}
 		</style>
 	</head>
@@ -188,6 +207,8 @@
 					<td id="progresscol">
 						&nbsp;<span id="statustext">Ready</span>
 						<div class="progressbase">
+							<span id="progressbar"></span>
+							<span id="progresstext">100%</span>
 						</div>
 					</td>
 					<td id="buttoncol">

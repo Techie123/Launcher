@@ -7,10 +7,11 @@ namespace Launcher
 {
     public partial class MainWindow : Form, IView
     {
+        private const int ProgressWidth = 675;
+
         public MainWindow()
         {
             CreateContent();
-
         }
 
         public void Attach(string html, string changelog, VersionInfo[] versions)
@@ -30,8 +31,6 @@ namespace Launcher
         {
             if (e.Title.StartsWith("PlayClicked"))
                 Controller.PlayActivated();
-            /*else if (e.Title == "Hearthstone Mod Launcher")
-                Controller.ViewLoaded();*/
         }
 
         public void Invoke(Action action)
@@ -41,12 +40,15 @@ namespace Launcher
 
         public void SetPlayText(string text)
         {
-            _webview1.ExecuteScript("document.getElementById('playbutton').innerHTML = '" + text + "'");
+            _webview1.ExecuteScript("document.getElementById('playbutton').innerHTML = '" + text + "';");
         }
 
         public void SetProgress(int progress)
         {
-            _progress1.Value = progress;
+            int width = ProgressWidth * 675 / 100;
+
+            _webview1.ExecuteScript("document.getElementById('progressbar').style.width = '" + width + "px';");
+            _webview1.ExecuteScript("document.getElementById('progresstext').innerHTML = '" + progress + "%';");
         }
 
         public void SetStatus(Status status)
@@ -67,7 +69,7 @@ namespace Launcher
 
         public void SetStatusText(string text)
         {
-            _webview1.ExecuteScript("document.getElementById('statustext').innerHTML = '" + text + "'");
+            _webview1.ExecuteScript("document.getElementById('statustext').innerHTML = '" + text + "';");
         }
 
         public void ShowError(string message)
