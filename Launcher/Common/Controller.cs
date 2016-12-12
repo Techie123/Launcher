@@ -90,7 +90,7 @@ namespace Launcher
             _index = 0;
 
             html = html.Replace("$PLAYTEXT", _playmode.ToString()).Replace("$CHANGELOG", changelogtext);
-            _view.Attach(html, changelogtext, _versions);
+            _view.Attach(html, _versions);
         }
 
         public static void PlayActivated()

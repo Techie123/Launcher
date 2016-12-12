@@ -4,7 +4,7 @@ namespace Launcher
 {
     public interface IView
     {
-        void Attach(string html, string changelog, VersionInfo[] versions);
+        void Attach(string html, VersionInfo[] versions);
 
         void Invoke(Action action);
 

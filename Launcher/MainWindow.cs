@@ -13,7 +13,7 @@ namespace Launcher
             CreateContent();
         }
 
-        public void Attach(string html, string changelog, VersionInfo[] versions)
+        public void Attach(string html, VersionInfo[] versions)
         {
             _webview1.LoadHtml(html, new Uri("file://" + AppDomain.CurrentDomain.BaseDirectory));
 
