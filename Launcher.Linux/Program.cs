@@ -8,8 +8,8 @@ namespace Launcher.Linux
     {
         public static void Main(string[] args)
         {
-            Global.Linux = true;
-            Global.Unix = true;
+            Global.IsLinux = true;
+            Global.IsUnix = true;
             Global.Is64bit = Environment.Is64BitOperatingSystem;
 
             var app = new Application(Platform.Detect);

@@ -1,35 +1,61 @@
 ﻿using System;
+using Eto.Drawing;
 using Eto.Forms;
 
 namespace Launcher
 {
     public partial class MainWindow : Form, IView
     {
-        private static int ProgressWidth = -1;
-        private static int Right = -1;
+        private bool _move;
+        private PointF _mousePosition;
 
         public MainWindow()
         {
             CreateContent();
+
+            _move = false;
+            _mousePosition = new PointF();
         }
 
-        public void Attach(string html, VersionInfo[] versions)
+        private void PanelTitlebar_MouseDown(object sender, MouseEventArgs e)
         {
-            _webview1.LoadHtml(html, new Uri("file://" + AppDomain.CurrentDomain.BaseDirectory));
+            _mousePosition = e.Location;
+            _move = true;
+        }
 
-            _combo1.Items.Clear();
-            _combo1.Items.Add("Latest");
-            foreach (var version in versions)
-                _combo1.Items.Add(version.Version);
-            _combo1.SelectedIndex = 0;
+        private void PanelTitlebar_MouseUp(object sender, MouseEventArgs e)
+        {
+            _move = false;
+        }
 
-            _webview1.DocumentTitleChanged += _webview1_DocumentTitleChanged;
+        private void PanelTitlebar_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (_move)
+            {
+                var newx = (int)(Location.X + e.Location.X - _mousePosition.X);
+                var newy = (int)(Location.Y + e.Location.Y - _mousePosition.Y);
+
+                if (Location.X != newx || Location.Y != newy)
+                    Location = new Point(newx, newy);
+            }
         }
 
         private void _webview1_DocumentTitleChanged(object sender, WebViewTitleEventArgs e)
         {
             if (e.Title.StartsWith("PlayClicked"))
                 Controller.PlayActivated();
+            else if (e.Title.StartsWith("CloseClicked"))
+                Application.Instance.Quit();
+            else if (e.Title.StartsWith("MinimizeClicked"))
+                Minimize();
+        }
+
+        #region IView
+
+        public void Attach(string html, VersionInfo[] versions)
+        {
+            _webview1.LoadHtml(html, new Uri("file://" + AppDomain.CurrentDomain.BaseDirectory));
+            _webview1.DocumentTitleChanged += _webview1_DocumentTitleChanged;
         }
 
         public void Invoke(Action action)
@@ -39,21 +65,12 @@ namespace Launcher
 
         public void SetPlayText(string text)
         {
-            _webview1.ExecuteScript("document.getElementById('playbutton').innerHTML = '" + text + "';");
+            _webview1.ExecuteScript("setplaytext('" + text + "');");
         }
 
         public void SetProgress(int progress)
         {
-            if (ProgressWidth == -1)
-            {
-                ProgressWidth = int.Parse(_webview1.ExecuteScript("return document.getElementById('progressbar').offsetWidth;"));
-                Right = 50;
-            }
-
-            int right = (ProgressWidth - (progress * ProgressWidth / 100)) + Right;
-
-            _webview1.ExecuteScript("document.getElementById('progressbar').style.right = '" + right + "px';");
-            _webview1.ExecuteScript("document.getElementById('progresstext').innerHTML = '" + progress + "%';");
+            _webview1.ExecuteScript("setprogress(" + progress + ");");
         }
 
         public void SetStatus(Status status)
@@ -72,12 +89,14 @@ namespace Launcher
 
         public void SetStatusText(string text)
         {
-            _webview1.ExecuteScript("document.getElementById('statustext').innerHTML = '" + text + "';");
+            _webview1.ExecuteScript("setstatustext('" + text + "');");
         }
 
         public void ShowError(string message)
         {
             MessageBox.Show(this, message, MessageBoxType.Error);
         }
+
+        #endregion
     }
 }

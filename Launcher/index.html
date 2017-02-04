@@ -1,310 +1,373 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
-	<head>
-		<meta http-equiv='Content-Type' content='text/html; charset=unicode' />
-		<meta http-equiv='X-UA-Compatible' content='IE=11' /> 
-		<title>Hearthstone Mod Launcher</title>
-		<script type="text/javascript" language="javascript">
-			var counter = 0;
-			var playenabled = true;
-			
-			function playclicked()
-			{
-				if (!playenabled)
-					return;
-			
-				counter++;
-				document.title = "PlayClicked" + counter;
-			}
 
-			function setplayenabled(enabled)
-			{
-			    var playbutton = document.getElementById('playbutton');
-			    playenabled = enabled;
+<head>
+	<meta http-equiv='Content-Type' content='text/html; charset=unicode' />
+	<meta http-equiv='X-UA-Compatible' content='IE=11' />
+	<title>Hearthstone Mod Launcher</title>
+	<script type="text/javascript" language="javascript">
+		var progresswidth = -1;
+		var counter = 0;
+		var playenabled = true;
 
-                if (enabled)
-			        playbutton.className = 'button-link';
-                else
-                    playbutton.className = 'button-link-disabled';
+		function playclicked() {
+			if (!playenabled)
+				return;
 
-                // Force redraw in IE
-			    playbutton.style.display = 'none';
-			    playbutton.style.display = 'inline-block';
-			    playbutton.blur();
-			}
-		</script>
-		<style type="text/css">
-			::-webkit-scrollbar
-			{
-			    width: 12px;
-			}
+			counter++;
+			document.title = 'PlayClicked' + counter;
+		}
 
-			::-webkit-scrollbar-track
-			{
-				background: transparent;
-			}
+		function closeclicked() {
+			counter++;
+			document.title = 'CloseClicked' + counter;
+		}
 
-			::-webkit-scrollbar-thumb
-			{
-			    -webkit-border-radius: 1px;
-			    border-radius: 1px;
-			    background: rgba(150, 150, 150, 0.8); 
-			}
+		function minimizeclicked() {
+			counter++;
+			document.title = 'MinimizeClicked' + counter;
+		}
 
-			::-webkit-scrollbar-thumb:hover
-			{
-			    background: rgba(200, 200, 200, 0.8); 
-			}
+		// IView
+
+		function setplaytext(text) {
+			document.getElementById('playbutton').innerHTML = text;
+		}
+
+		function setprogress(progress) {
+			if (progresswidth == -1)
+				progresswidth = document.getElementById('progressbar').offsetWidth;
+
+			var right = (progresswidth - (progress * progresswidth / 100)) + 50;
+
+			document.getElementById('progressbar').style.right = right + 'px';
+			document.getElementById('progresstext').innerHTML = progress + '%';
+		}
+
+		function setstatustext(text) {
+			document.getElementById('statustext').innerHTML = text;
+		}
+
+		function setplayenabled(enabled) {
+			var playbutton = document.getElementById('playbutton');
+			playenabled = enabled;
+
+			if (enabled)
+				playbutton.className = 'button-link';
+			else
+				playbutton.className = 'button-link-disabled';
+
+			// Force redraw in IE
+			playbutton.style.display = 'none';
+			playbutton.style.display = 'inline-block';
+			playbutton.blur();
+		}
+	</script>
+	<style type="text/css">
+		::-webkit-scrollbar {
+			width: 12px;
+		}
+
+		::-webkit-scrollbar-track {
+			background: transparent;
+		}
+
+		::-webkit-scrollbar-thumb {
+			-webkit-border-radius: 1px;
+			border-radius: 1px;
+			background: rgba(150, 150, 150, 0.8);
+		}
+
+		::-webkit-scrollbar-thumb:hover {
+			background: rgba(200, 200, 200, 0.8);
+		}
+
+		body {
+			background: black;
+			text-shadow: 0 0 20px #000, 0 0 15px #000, 0 0 10px #000, 0 0 5px #000;
+			font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+			/* Unselectable */
+			-moz-user-select: none;
+			-webkit-user-select: none;
+			-ms-user-select:none;
+			user-select:none;
+			-o-user-select:none;
+		}
+
+		video {
+			position: fixed;
+			top: 0%;
+			left: 50%;
+			min-width: 100%;
+			min-height: 100%;
+			width: auto;
+			height: auto;
+			z-index: -100;
+			transform: translateX(-50%) translateY(0%);
+			-webkit-transform: translate(-50%, 0%);
+			-moz-transform: translate(-50%, 0%);
+			-ms-transform: translate(-50%, 0%);
+		}
+
+		#titlebar {
+			position: fixed;
+			top: 0px;
+			left: 0px;
+			right: 0px;
+			height: 35px;
+			line-height: 35px;
+			color: white;
+			margin-left: 10px;
+			margin-right: 10px;
+		}
+
+		#button-close {
+			position: fixed;
+			top: 10px;
+			right: 10px;
+			width: 16px;
+			height: 16px;
+			background-image: url('Data/button-close.png');
+		    background-repeat: no-repeat;
+		    background-size: contain;
+		}
+
+		#button-close:hover {
+			background-image: url('Data/button-close-hover.png');
+		}
+
+		#button-minimize {
+			position: fixed;
+			top: 10px;
+			right: 31px;
+			width: 16px;
+			height: 16px;
+			background-image: url('Data/button-minimize.png');
+		    background-repeat: no-repeat;
+		    background-size: contain;
+		}
+
+		#button-minimize:hover {
+			background-image: url('Data/button-minimize-hover.png');
+		}
 			
-			body
-			{
-				background: black;
-				text-shadow: 0 0 20px #000, 0 0 15px #000, 0 0 10px #000, 0 0 5px #000;
-				font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-			}
-			
-			video
-			{
-				position: fixed;
-				top: 0%;
-				left: 50%;
-				min-width: 100%;
-				min-height: 100%;
-				width: auto;
-				height: auto;
-				z-index: -100;
-				transform: translateX(-50%) translateY(0%);
-				-webkit-transform: translate(-50%, 0%);
-				-moz-transform: translate(-50%, 0%);
-				-ms-transform: translate(-50%, 0%);
-			}
+		#textarea {
+			position: fixed;
+			top: 40px;
+			left: 10px;
+			right: 10px;
+			bottom: 90px;
+			background: transparent;
+			overflow-y: scroll;
+			color: white;
+			resize: none;
+			border: 0 none;
+			outline: none;
+			cursor: default;
+			/* Custom IE scrollbar */
+			scrollbar-base-color: #004400;
+			scrollbar-3dlight-color: #004400;
+			scrollbar-highlight-color: #004400;
+			scrollbar-track-color: rgba(150, 150, 150, 0.8);
+			scrollbar-arrow-color: black;
+			scrollbar-shadow-color: #004400;
+		}
 
-			#textarea
-			{
-				position: fixed;
-				top: 10px;
-				left: 10px;
-				right: 10px;
-				bottom: 90px;
-			
-				background: transparent;
-				overflow-y: scroll;
-				color: white;
-				resize: none;
-				border: 0 none;
-				outline: none;
+		#buttonarea {
+			position: fixed;
+			bottom: 20px;
+			right: 10px;
+			left: 10px;
+			color: white;
+			height: 60px;
+			resize: none;
+			border: 0 none;
+			outline: none;
+			cursor: default;
+		}
 
-                /* Custom IE scrollbar */
-                scrollbar-base-color: #004400;
-                scrollbar-3dlight-color: #004400;
-                scrollbar-highlight-color: #004400;
-                scrollbar-track-color: rgba(150, 150, 150, 0.8);
-                scrollbar-arrow-color: black;
-                scrollbar-shadow-color: #004400;
-			}
+		img {
+			width: 80%;
+			height: auto;
+		}
 
-			#buttonarea
-			{
-				position: fixed;
-				bottom: 20px;
-				right: 10px;
-				left: 10px;
+		table {
+			width: 100%;
+			height: 100%;
+			word-break: normal;
+			word-break: keep-all;
+		}
 
-				color: white;
-				height: 60px;
-				resize: none;
-				border: 0 none;
-				outline: none;
-			}
+		progress,
+		select {
+			width: 100%;
+			height: 25px;
+		}
 
-			img
-			{
-				width: 80%;
-				height: auto;
-			}
-			
-			table
-			{				
-				width: 100%;
-				height: 100%;
-				word-break: normal;
-				word-break: keep-all;
-			}
-			
-			progress, select
-			{				
-				width: 100%;
-				height: 25px;
-			}
-			
-			#progresscol
-			{
-				width: 85%;
-				text-align: left;
-			}
+		#progresscol {
+			width: 85%;
+			text-align: left;
+		}
 
-			.button-link
-			{
-				box-sizing: border-box;
-				display: inline-block;
-				width: 100%;
-				height: 100%;
-				font-size: 22px;
-				line-height: 60px;
-				vertical-align: middle;
-				text-align: center;
-				text-decoration: none;
-				background: #004400;
-				color: #FFF;
-				-webkit-border-radius: 4px;
-				-moz-border-radius: 4px;
-				border-radius: 4px;
-				border: solid 1px #004500;
-				text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.4);
-				-webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
-				-moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
-				box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
-				-webkit-transition-duration: 0.2s;
-				-moz-transition-duration: 0.2s;
-				transition-duration: 0.2s;
-				-webkit-user-select:none;
-				-moz-user-select:none;
-				-ms-user-select:none;
-				user-select:none;
-			}
-			
-			.button-link:hover
-			{
-				background: #006600;
-				border: solid 1px #006700;
-				text-decoration: none;
-			}
-			
-			.button-link:active
-			{
-				-webkit-box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.6);
-				-moz-box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.6);
-				box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.6);
-				background: #005500;
-				border: solid 1px #005600;
-			}
+		.button-link {
+			box-sizing: border-box;
+			display: inline-block;
+			width: 100%;
+			height: 100%;
+			font-size: 22px;
+			line-height: 60px;
+			vertical-align: middle;
+			text-align: center;
+			text-decoration: none;
+			background: #004400;
+			color: #FFF;
+			-webkit-border-radius: 4px;
+			-moz-border-radius: 4px;
+			border-radius: 4px;
+			border: solid 1px #004500;
+			text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.4);
+			-webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
+			-moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
+			box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
+			-webkit-transition-duration: 0.2s;
+			-moz-transition-duration: 0.2s;
+			transition-duration: 0.2s;
+			-webkit-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
+			user-select: none;
+		}
 
-			.button-link-disabled
-			{
-				box-sizing: border-box;
-				display: inline-block;
-				width: 100%;
-				height: 100%;
-				font-size: 22px;
-				line-height: 60px;
-				vertical-align: middle;
-				text-align: center;
-				text-decoration: none;
-				background: #004400;
-				color: #FFF;
-				-webkit-border-radius: 4px;
-				-moz-border-radius: 4px;
-				border-radius: 4px;
-				text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.4);
-				-webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
-				-moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
-				box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
-				-webkit-transition-duration: 0.2s;
-				-moz-transition-duration: 0.2s;
-				transition-duration: 0.2s;
-				-webkit-user-select:none;
-				-moz-user-select:none;
-				-ms-user-select:none;
-				user-select:none;
-			
-				cursor: default;
-				background-image: none;
-				opacity: 0.65;
-				filter: alpha(opacity=65);
-				-webkit-box-shadow: none;
-				-moz-box-shadow: none;
-				box-shadow: none;
-				color: #333;
-				background-color: #E6E6E6;
-			}
-			
-			.progressbase
-			{
-				width: 100%;
-				height: 30px;
-				margin-top: 4px;
-				position: relative;
-				
-				box-sizing: border-box;
-				padding: 10px 15px;
-				background: rgba(0, 0, 0, 0.6);
-				color: #FFF;
-				-webkit-border-radius: 4px;
-				-moz-border-radius: 4px;
-				border-radius: 4px;
-				border: solid 1px rgba(255, 255, 255, 0.15);
-				text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.4);
-				-webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
-				-moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
-				box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
-				-webkit-transition-duration: 0.2s;
-				-moz-transition-duration: 0.2s;
-				transition-duration: 0.2s;
-				-webkit-user-select:none;
-				-moz-user-select:none;
-				-ms-user-select:none;
-				user-select:none;
-			}
-			
-			#progressbar
-			{
-				position: absolute;
-				top: 50%;
-				height: 2px;
-				margin-top: -1px;
-                padding-left: -30px;
-                left: 15px;
-                right: 50px;
-				background: white;
-			}
-			
-			#progresstext
-			{
-				position: absolute;
-				right: 10px;
-				font-size: 12px;
-				top: 50%;
-				margin-top: -8px;
-			}
+		.button-link:hover {
+			background: #006600;
+			border: solid 1px #006700;
+			text-decoration: none;
+		}
 
-			#statustext
-			{
-				font-size: 12px;
-			}
-		</style>
-	</head>
-	<body>
-		<video autoplay="" loop="">
-			<source src="Data/header-illidan.mp4" type="video/mp4" />
-		</video>
-		<div id="textarea" readonly>
-			$CHANGELOG
-		</div>
-		<div id="buttonarea">
-			<table>
-				<tr>
-					<td id="progresscol">
-						&nbsp;<span id="statustext">Ready</span>
-						<div class="progressbase">
-							<span id="progressbar"></span>
-							<span id="progresstext">100%</span>
-						</div>
-					</td>
-					<td id="buttoncol">
-						<a href="javascript:playclicked()" id="playbutton" class="button-link">$PLAYTEXT</a>
-					</td>
-				</tr>
-			</table>
-		</div>
-	</body>
+		.button-link:active {
+			-webkit-box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.6);
+			-moz-box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.6);
+			box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.6);
+			background: #005500;
+			border: solid 1px #005600;
+		}
+
+		.button-link-disabled {
+			box-sizing: border-box;
+			display: inline-block;
+			width: 100%;
+			height: 100%;
+			font-size: 22px;
+			line-height: 60px;
+			vertical-align: middle;
+			text-align: center;
+			text-decoration: none;
+			background: #004400;
+			color: #FFF;
+			-webkit-border-radius: 4px;
+			-moz-border-radius: 4px;
+			border-radius: 4px;
+			text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.4);
+			-webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
+			-moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
+			box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
+			-webkit-transition-duration: 0.2s;
+			-moz-transition-duration: 0.2s;
+			transition-duration: 0.2s;
+			-webkit-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
+			user-select: none;
+			cursor: default;
+			background-image: none;
+			opacity: 0.65;
+			filter: alpha(opacity=65);
+			-webkit-box-shadow: none;
+			-moz-box-shadow: none;
+			box-shadow: none;
+			color: #333;
+			background-color: #E6E6E6;
+		}
+
+		.progressbase {
+			width: 100%;
+			height: 30px;
+			margin-top: 4px;
+			position: relative;
+			box-sizing: border-box;
+			padding: 10px 15px;
+			background: rgba(0, 0, 0, 0.6);
+			color: #FFF;
+			-webkit-border-radius: 4px;
+			-moz-border-radius: 4px;
+			border-radius: 4px;
+			border: solid 1px rgba(255, 255, 255, 0.15);
+			text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.4);
+			-webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
+			-moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
+			box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
+			-webkit-transition-duration: 0.2s;
+			-moz-transition-duration: 0.2s;
+			transition-duration: 0.2s;
+			-webkit-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
+			user-select: none;
+		}
+
+		#progressbar {
+			position: absolute;
+			top: 50%;
+			height: 2px;
+			margin-top: -1px;
+			padding-left: -30px;
+			left: 15px;
+			right: 50px;
+			background: white;
+		}
+
+		#progresstext {
+			position: absolute;
+			right: 10px;
+			font-size: 12px;
+			top: 50%;
+			margin-top: -8px;
+		}
+
+		#statustext {
+			font-size: 12px;
+		}
+	</style>
+</head>
+
+<body unselectable="on" onselectstart="return false;" onmousedown="return false;">
+	<video id="background_video" autoplay="" loop="">
+		<source src="Data/header-illidan.mp4" type="video/mp4" />
+	</video>
+	<div id="titlebar">
+		Hearthstone Mod Launcher
+		<a id="button-close" href="javascript:closeclicked()"></a>
+		<a id="button-minimize" href="javascript:minimizeclicked()"></a>
+	</div>
+	<div id="textarea" readonly>
+		$CHANGELOG
+	</div>
+	<div id="buttonarea">
+		<table>
+			<tr>
+				<td id="progresscol">
+					&nbsp;<span id="statustext">Ready</span>
+					<div class="progressbase">
+						<span id="progressbar"></span>
+						<span id="progresstext">100%</span>
+					</div>
+				</td>
+				<td id="buttoncol">
+					<a href="javascript:playclicked()" id="playbutton" class="button-link">$PLAYTEXT</a>
+				</td>
+			</tr>
+		</table>
+	</div>
+</body>
+
 </html>

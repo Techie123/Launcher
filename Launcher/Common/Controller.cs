@@ -12,11 +12,16 @@ namespace Launcher
     public static class Controller
     {
         private const string GameLocation = "HSMod";
+        private const string LauncherLocation = "Launcher";
+        private const string UpdateLocation = "Update";
+        private const string CacheLocation = "Cache";
         private const string GameVersions = "http://api.hsmod.com/gameversion";
+        private const string LauncherVersions = "http://api.hsmod.com/launcherversion";
         private const string Changelog = "http://api.hsmod.com/changelog";
 
-        private static string _gamepath;
-        private static VersionInfo[] _versions;
+        private static string _basepath, _gamepath;
+        private static VersionInfo[] _gameversions;
+        private static VersionInfo _launcherversion;
         private static IView _view;
         private static PlayMode _playmode;
         private static Status _status;
@@ -26,62 +31,128 @@ namespace Launcher
         {
             _view = view;
 
-            _gamepath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, GameLocation);
+            var curdir = AppDomain.CurrentDomain.BaseDirectory.TrimEnd(new char[] { '/', '\\' });
+            _basepath = Path.GetDirectoryName(curdir);
+            _gamepath = Path.Combine(_basepath, GameLocation);
 
-            var changelogtext = "";
-            var html = "";
+            if (Path.GetFileName(curdir) == UpdateLocation)
+            {
+                // Update self
+                var newdir = Path.Combine(_basepath, LauncherLocation);
+
+                while (true)
+                {
+                    try
+                    {
+                        if (Directory.Exists(newdir))
+                            Directory.Delete(newdir, true);
+                        Helper.CopyDirectory(curdir, newdir);
+                        break;
+                    }
+                    catch { }
+                }
+
+                if(Global.IsUnix)
+                    Process.Start("mono", Path.Combine(newdir, "Launcher.exe"));
+                else
+                    Process.Start(Path.Combine(newdir, "Launcher.exe"));
+                Process.GetCurrentProcess().Kill();
+            }
+            else
+            {
+                // Delete old update cache if found
+                var updatedir = Path.Combine(_basepath, UpdateLocation);
+
+                while (true)
+                {
+                    try
+                    {
+                        if (Directory.Exists(updatedir))
+                            Directory.Delete(updatedir, true);
+                        break;
+                    }
+                    catch { }
+                }
+            }
+
             var assembly = typeof(MainWindow).GetTypeInfo().Assembly;
+            var html = "";
+            var changeloglocation = Path.Combine(CacheLocation, "changelog.txt");
+            var changelogtext = "";
+            var changelog = new string[0];
+            var ulstarted = false;
 
+            // Read default HTML / CSS / JavaScript
             using (var stream = assembly.GetManifestResourceStream("Launcher.index.html"))
             using (var reader = new StreamReader(stream))
                 html = reader.ReadToEnd();
 
+            // Download newest Launcher Info / Game Version Info / Changelog
             try
             {
                 var client = new System.Net.WebClient();
-                var changelog = new string[0];
-                var ulstarted = false;
+                _gameversions = JsonConvert.DeserializeObject<VersionInfo[]>(client.DownloadString(GameVersions));
+                _launcherversion = new VersionInfo();
 
-                _versions = JsonConvert.DeserializeObject<VersionInfo[]>(client.DownloadString(GameVersions));
-                changelog = client.DownloadString(Changelog).Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+                if (!Directory.Exists(CacheLocation))
+                    Directory.CreateDirectory(CacheLocation);
 
-                // Formate Markdown to HTML
-                for (int i = 0; i < changelog.Length; i++)
-                {
-                    var line = changelog[i];
-                    line = line.Trim(new char[] { ' ', ':' });
-                    line = line.Replace("---", "");
-
-                    if (line.StartsWith("# "))
-                        line = "<h1>" + line.Substring(2) + "</h1>";
-                    else if (line.StartsWith("## "))
-                    {
-                        line = (ulstarted ? "</ul>" : "") + "<h4>" + line.Substring(3) + "</h4>";
-                        ulstarted = false;
-                    }
-                    else if (line.StartsWith("* "))
-                    {
-                        line = ((!ulstarted) ? "<ul>" : "") + "<li>" + line.Substring(2) + "</li>";
-                        if (!ulstarted)
-                            ulstarted = true;
-                    }
-                    else if (line.StartsWith("!["))
-                    {
-                        var src = line.Remove(line.Length - 1).Split('(')[1];
-                        line = "<img src='" + src + "' />";
-                    }
-
-                    changelog[i] = line;
-                }
-
-                changelogtext = string.Join("", changelog) + (ulstarted ? "</ul>" : "");
+                File.WriteAllText(changeloglocation, client.DownloadString(Changelog));
             }
             catch
             {
+                _gameversions = new VersionInfo[1];
+                _launcherversion = new VersionInfo();
                 _view.ShowError("Could not download the metadata, starting in offline mode...");
 
-                _versions = new VersionInfo[0];
+                var numbers = Directory.GetDirectories(_gamepath);
+                if (numbers.Length == 0)
+                {
+                    _view.ShowError("No game version found, exiting...");
+                    Process.GetCurrentProcess().Kill();
+                }
+                else
+                    _gameversions[0] = new VersionInfo { Version = numbers[0] };
             }
+
+            // Try and read changelog
+            try
+            {
+                if (File.Exists(changeloglocation))
+                    changelog = File.ReadAllLines(changeloglocation);
+            }
+            catch { }
+
+            // Formate changelog markdown to HTML
+            for (int i = 0; i < changelog.Length; i++)
+            {
+                var line = changelog[i];
+                line = line.Trim(new char[] { ' ', ':' });
+                line = line.Replace("---", "");
+
+                if (line.StartsWith("# "))
+                    line = "<h1>" + line.Substring(2) + "</h1>";
+                else if (line.StartsWith("## "))
+                {
+                    line = (ulstarted ? "</ul>" : "") + "<h4>" + line.Substring(3) + "</h4>";
+                    ulstarted = false;
+                }
+                else if (line.StartsWith("* "))
+                {
+                    line = ((!ulstarted) ? "<ul>" : "") + "<li>" + line.Substring(2) + "</li>";
+                    if (!ulstarted)
+                        ulstarted = true;
+                }
+                else if (line.StartsWith("!["))
+                {
+                    var src = line.Remove(line.Length - 1).Split('(')[1];
+                    line = "<img src='" + src + "' />";
+                }
+
+                changelog[i] = line;
+            }
+
+            changelogtext = string.Join("", changelog) + (ulstarted ? "</ul>" : "");
 
             _status = Status.Ready;
             ReloadPlay(false);
@@ -90,7 +161,7 @@ namespace Launcher
             _index = 0;
 
             html = html.Replace("$PLAYTEXT", _playmode.ToString()).Replace("$CHANGELOG", changelogtext);
-            _view.Attach(html, _versions);
+            _view.Attach(html, _gameversions);
         }
 
         public static void PlayActivated()
@@ -117,7 +188,7 @@ namespace Launcher
         {
             var game = new Process();
 
-            if (Global.Linux)
+            if (Global.IsLinux)
             {
                 // Set game executable permissions
                 var chmod = new Process();
@@ -133,7 +204,7 @@ namespace Launcher
                 game.StartInfo.Arguments = " -c \"" + filepath + "\"";
                 game.StartInfo.UseShellExecute = false;
             }
-            else if (Global.Windows)
+            else if (Global.IsWindows)
                 game.StartInfo.FileName = filepath;
 
             game.Start();
@@ -143,12 +214,19 @@ namespace Launcher
         {
             try
             {
-                var url = _versions[_index].Linux;
+                var launcherurl = _launcherversion.Linux;
+                var gameurl = _gameversions[_index].Linux;
 
-                if (Global.Windows && Global.Is64bit)
-                    url = _versions[_index].Windows64;
-                else if (Global.Windows && !Global.Is64bit)
-                    url = _versions[_index].Windows32;
+                if (Global.IsWindows && Global.Is64bit)
+                {
+                    launcherurl = _launcherversion.Windows64;
+                    gameurl = _gameversions[_index].Windows64;
+                }
+                else if (Global.IsWindows && !Global.Is64bit)
+                {
+                    launcherurl = _launcherversion.Windows32;
+                    gameurl = _gameversions[_index].Windows32;
+                }
 
                 _status = Status.Downloading;
                 _view.Invoke(() =>
@@ -161,11 +239,12 @@ namespace Launcher
                 var client = new MegaApiClient();
                 client.LoginAnonymous();
 
-                var temppath = Path.GetTempPath() + Guid.NewGuid().ToString();
+                _view.Invoke(() => _view.SetStatusText("Downloading Launcher..."));
 
-                _view.Invoke(() => _view.SetStatusText("Downloading..."));
+                _view.Invoke(() => _view.SetStatusText("Downloading Game..."));
+                var temppath = Path.GetTempPath() + Guid.NewGuid().ToString();
                 using (var fileStream = new FileStream(temppath, FileMode.Create))
-                using (var downloadStream = new ProgressionStream(client.Download(new Uri(url)), SetDownloadProgress))
+                using (var downloadStream = new ProgressionStream(client.Download(new Uri(gameurl)), SetDownloadProgress))
                     downloadStream.CopyTo(fileStream);
 
                 _status = Status.Installing;
@@ -180,7 +259,7 @@ namespace Launcher
 
                 Directory.CreateDirectory(_gamepath);
                 
-                ZipFile.ExtractToDirectory(temppath, Path.Combine(_gamepath, _versions[_index].Version));
+                ZipFile.ExtractToDirectory(temppath, Path.Combine(_gamepath, _gameversions[_index].Version));
                 File.Delete(temppath);
             }
             catch(Exception ex)
@@ -201,7 +280,7 @@ namespace Launcher
         private static void PlayGame(string directory = null)
         {
             if (directory == null)
-                directory = Path.Combine(_gamepath, _versions[_index].Version);
+                directory = Path.Combine(_gamepath, _gameversions[_index].Version);
 
             var files = Directory.GetFiles(directory);
             var filepath = "";
@@ -222,9 +301,9 @@ namespace Launcher
             foreach (var file in files)
             {
                 if (
-                    (Global.Linux && Global.Is64bit && file.EndsWith("x86_64")) ||
-                    (Global.Linux && !Global.Is64bit && file.EndsWith("x86")) ||
-                    (Global.Windows && file.EndsWith(".exe"))
+                    (Global.IsLinux && Global.Is64bit && file.EndsWith("x86_64")) ||
+                    (Global.IsLinux && !Global.Is64bit && file.EndsWith("x86")) ||
+                    (Global.IsWindows && file.EndsWith(".exe"))
                    )
                 {
                     filepath = file;
@@ -240,7 +319,7 @@ namespace Launcher
             if (_status != Status.Ready)
                 return;
 
-            if (Directory.Exists(Path.Combine(_gamepath, _versions[_index].Version)))
+            if (Directory.Exists(Path.Combine(_gamepath, _gameversions[_index].Version)))
                 _playmode = PlayMode.Play;
             else if (Directory.GetDirectories(_gamepath).Length > 0)
                 _playmode = PlayMode.Update;

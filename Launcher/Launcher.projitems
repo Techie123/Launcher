@@ -21,6 +21,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Common\PlayMode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\Global.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\Settings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\Helper.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)Common\" />
@@ -36,8 +37,15 @@
     <EmbeddedResource Include="$(MSBuildThisFileDirectory)Resources\Settings.png">
       <LogicalName>Launcher.Resources.Settings.png</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)Resources\Logo.ico">
+      <LogicalName>Launcher.Resources.Logo.ico</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)Data\header-illidan.mp4" />
+    <None Include="$(MSBuildThisFileDirectory)Data\button-close.png" />
+    <None Include="$(MSBuildThisFileDirectory)Data\button-minimize.png" />
+    <None Include="$(MSBuildThisFileDirectory)Data\button-close-hover.png" />
+    <None Include="$(MSBuildThisFileDirectory)Data\button-minimize-hover.png" />
   </ItemGroup>
 </Project>

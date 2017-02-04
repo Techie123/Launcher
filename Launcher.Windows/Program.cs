@@ -9,7 +9,7 @@ namespace Launcher.Windows
         [STAThread]
         static void Main(string[] args)
         {
-            Global.Windows = true;
+            Global.IsWindows = true;
             Global.Is64bit = Environment.Is64BitOperatingSystem;
 
             var app = new Application(Platform.Detect);
