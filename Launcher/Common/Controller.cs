@@ -91,7 +91,8 @@ namespace Launcher
             {
                 var client = new System.Net.WebClient();
                 _gameversions = JsonConvert.DeserializeObject<VersionInfo[]>(client.DownloadString(GameVersions));
-                _gameversions = JsonConvert.DeserializeObject<VersionInfo[]>(client.DownloadString(LauncherVersion));
+
+				_launcherversion = JsonConvert.DeserializeObject<VersionInfo>(client.DownloadString(LauncherVersion));
 
                 if (!Directory.Exists(Path.Combine(curdir, CacheLocation)))
                     Directory.CreateDirectory(Path.Combine(curdir, CacheLocation));
@@ -105,14 +106,13 @@ namespace Launcher
                 _launcherversion.Version = Assembly.GetEntryAssembly().GetName().Version.ToString();
                 _view.ShowError("Could not download the metadata, starting in offline mode...");
 
-                var numbers = Directory.GetDirectories(_gamepath);
-                if (numbers.Length == 0)
+				if (!Directory.Exists(_gamepath) || Directory.GetDirectories(_gamepath).Length == 0)
                 {
                     _view.ShowError("No game version found, exiting...");
                     Process.GetCurrentProcess().Kill();
                 }
                 else
-                    _gameversions[0] = new VersionInfo { Version = numbers[0] };
+                    _gameversions[0] = new VersionInfo { Version = Directory.GetDirectories(_gamepath)[0] };
             }
 
             // Try and read changelog
@@ -352,7 +352,7 @@ namespace Launcher
 
             var noupdate = Assembly.GetEntryAssembly().GetName().Version.ToString() == _launcherversion.Version;
 
-            if (Directory.GetDirectories(_gamepath).Length == 0)
+            if (!Directory.Exists(_gamepath) || Directory.GetDirectories(_gamepath).Length == 0)
                 _playmode = PlayMode.Install;
             else if (!Directory.Exists(Path.Combine(_gamepath, _gameversions[_index].Version)) || !noupdate)
                 _playmode = PlayMode.Update;

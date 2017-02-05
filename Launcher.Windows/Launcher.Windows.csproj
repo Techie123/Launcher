@@ -79,6 +79,22 @@
       <Link>Data\header-illidan.mp4</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\Launcher\Data\button-close.png">
+      <Link>Data\button-close.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Launcher\Data\button-close-hover.png">
+      <Link>Data\button-close-hover.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Launcher\Data\button-minimize.png">
+      <Link>Data\button-minimize.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Launcher\Data\button-minimize-hover.png">
+      <Link>Data\button-minimize-hover.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="..\Launcher\Launcher.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
