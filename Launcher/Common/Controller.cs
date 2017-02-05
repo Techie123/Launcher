@@ -16,10 +16,10 @@ namespace Launcher
         private const string UpdateLocation = "Update";
         private const string CacheLocation = "Cache";
         private const string GameVersions = "http://api.hsmod.com/gameversion";
-        private const string LauncherVersions = "http://api.hsmod.com/launcherversion";
+        private const string LauncherVersion = "http://api.hsmod.com/launcherversion";
         private const string Changelog = "http://api.hsmod.com/changelog";
 
-        private static string _basepath, _gamepath;
+        private static string _basepath, _gamepath, _updatepath;
         private static VersionInfo[] _gameversions;
         private static VersionInfo _launcherversion;
         private static IView _view;
@@ -34,6 +34,7 @@ namespace Launcher
             var curdir = AppDomain.CurrentDomain.BaseDirectory.TrimEnd(new char[] { '/', '\\' });
             _basepath = Path.GetDirectoryName(curdir);
             _gamepath = Path.Combine(_basepath, GameLocation);
+            _updatepath = Path.Combine(_basepath, UpdateLocation);
 
             if (Path.GetFileName(curdir) == UpdateLocation)
             {
@@ -61,14 +62,12 @@ namespace Launcher
             else
             {
                 // Delete old update cache if found
-                var updatedir = Path.Combine(_basepath, UpdateLocation);
-
                 while (true)
                 {
                     try
                     {
-                        if (Directory.Exists(updatedir))
-                            Directory.Delete(updatedir, true);
+                        if (Directory.Exists(_updatepath))
+                            Directory.Delete(_updatepath, true);
                         break;
                     }
                     catch { }
@@ -77,7 +76,7 @@ namespace Launcher
 
             var assembly = typeof(MainWindow).GetTypeInfo().Assembly;
             var html = "";
-            var changeloglocation = Path.Combine(CacheLocation, "changelog.txt");
+            var changeloglocation = Path.Combine(curdir, CacheLocation, "changelog.txt");
             var changelogtext = "";
             var changelog = new string[0];
             var ulstarted = false;
@@ -92,10 +91,10 @@ namespace Launcher
             {
                 var client = new System.Net.WebClient();
                 _gameversions = JsonConvert.DeserializeObject<VersionInfo[]>(client.DownloadString(GameVersions));
-                _launcherversion = new VersionInfo();
+                _gameversions = JsonConvert.DeserializeObject<VersionInfo[]>(client.DownloadString(LauncherVersion));
 
-                if (!Directory.Exists(CacheLocation))
-                    Directory.CreateDirectory(CacheLocation);
+                if (!Directory.Exists(Path.Combine(curdir, CacheLocation)))
+                    Directory.CreateDirectory(Path.Combine(curdir, CacheLocation));
 
                 File.WriteAllText(changeloglocation, client.DownloadString(Changelog));
             }
@@ -103,6 +102,7 @@ namespace Launcher
             {
                 _gameversions = new VersionInfo[1];
                 _launcherversion = new VersionInfo();
+                _launcherversion.Version = Assembly.GetEntryAssembly().GetName().Version.ToString();
                 _view.ShowError("Could not download the metadata, starting in offline mode...");
 
                 var numbers = Directory.GetDirectories(_gamepath);
@@ -239,28 +239,59 @@ namespace Launcher
                 var client = new MegaApiClient();
                 client.LoginAnonymous();
 
-                _view.Invoke(() => _view.SetStatusText("Downloading Launcher..."));
-
-                _view.Invoke(() => _view.SetStatusText("Downloading Game..."));
-                var temppath = Path.GetTempPath() + Guid.NewGuid().ToString();
-                using (var fileStream = new FileStream(temppath, FileMode.Create))
-                using (var downloadStream = new ProgressionStream(client.Download(new Uri(gameurl)), SetDownloadProgress))
-                    downloadStream.CopyTo(fileStream);
-
-                _status = Status.Installing;
-                _view.Invoke(() =>
+                if (Assembly.GetEntryAssembly().GetName().Version.ToString() != _launcherversion.Version)
                 {
-                    _view.SetStatus(_status);
-                    _view.SetStatusText("Installing...");
-                });
+                    _view.Invoke(() => _view.SetStatusText("Downloading Launcher..."));
 
-                if (Directory.Exists(_gamepath))
-                    Directory.Delete(_gamepath, true);
+                    var temppath = Path.GetTempPath() + Guid.NewGuid().ToString();
+                    using (var fileStream = new FileStream(temppath, FileMode.Create))
+                    using (var downloadStream = new ProgressionStream(client.Download(new Uri(launcherurl)), SetDownloadProgress))
+                        downloadStream.CopyTo(fileStream);
 
-                Directory.CreateDirectory(_gamepath);
-                
-                ZipFile.ExtractToDirectory(temppath, Path.Combine(_gamepath, _gameversions[_index].Version));
-                File.Delete(temppath);
+                    _status = Status.Installing;
+                    _view.Invoke(() =>
+                    {
+                        _view.SetStatus(_status);
+                        _view.SetStatusText("Updating Launcher...");
+                    });
+                    
+                    if (Directory.Exists(_updatepath))
+                        Directory.Delete(_updatepath, true);
+                    Directory.CreateDirectory(_updatepath);
+                    ZipFile.ExtractToDirectory(temppath, _updatepath);
+
+                    File.Delete(temppath);
+
+                    if (Global.IsUnix)
+                        Process.Start("mono", Path.Combine(Path.Combine(_basepath, UpdateLocation), "Launcher.exe"));
+                    else
+                        Process.Start(Path.Combine(Path.Combine(_basepath, UpdateLocation), "Launcher.exe"));
+                    Process.GetCurrentProcess().Kill();
+                }
+
+                if (!Directory.Exists(Path.Combine(_gamepath, _gameversions[_index].Version)))
+                {
+                    _view.Invoke(() => _view.SetStatusText("Downloading Game..."));
+
+                    var temppath = Path.GetTempPath() + Guid.NewGuid().ToString();
+                    using (var fileStream = new FileStream(temppath, FileMode.Create))
+                    using (var downloadStream = new ProgressionStream(client.Download(new Uri(gameurl)), SetDownloadProgress))
+                        downloadStream.CopyTo(fileStream);
+
+                    _status = Status.Installing;
+                    _view.Invoke(() =>
+                    {
+                        _view.SetStatus(_status);
+                        _view.SetStatusText("Updating Game...");
+                    });
+
+                    if (Directory.Exists(_gamepath))
+                        Directory.Delete(_gamepath, true);
+                    Directory.CreateDirectory(_gamepath);
+                    ZipFile.ExtractToDirectory(temppath, Path.Combine(_gamepath, _gameversions[_index].Version));
+
+                    File.Delete(temppath);
+                }
             }
             catch(Exception ex)
             {
@@ -319,12 +350,14 @@ namespace Launcher
             if (_status != Status.Ready)
                 return;
 
-            if (Directory.Exists(Path.Combine(_gamepath, _gameversions[_index].Version)))
-                _playmode = PlayMode.Play;
-            else if (Directory.GetDirectories(_gamepath).Length > 0)
+            var noupdate = Assembly.GetEntryAssembly().GetName().Version.ToString() == _launcherversion.Version;
+
+            if (Directory.GetDirectories(_gamepath).Length == 0)
+                _playmode = PlayMode.Install;
+            else if (!Directory.Exists(Path.Combine(_gamepath, _gameversions[_index].Version)) || !noupdate)
                 _playmode = PlayMode.Update;
             else
-                _playmode = PlayMode.Install;
+                _playmode = PlayMode.Play;
 
             if (reloadview)
                 _view.SetPlayText(_playmode.ToString());
