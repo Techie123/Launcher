@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Name=Hearthstone Mod
+GenericName=Hearthstone Mod
+Comment=A game/mod for Hearthstone
+Exec=hearthstone-mod
+TryExec=hearthstone-mod
+Icon=/opt/HearthstoneMod/Launcher/Logo.ico
+StartupNotify=true
+Terminal=false
+Type=Application
+Categories=Game;CardGame;

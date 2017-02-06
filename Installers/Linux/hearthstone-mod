@@ -1,0 +1,3 @@
+#!/bin/bash
+
+mono /opt/HearthstoneMod/Launcher/Launcher.exe

@@ -1,21 +1,21 @@
 using System;
 using System.IO;
 
-Task("Default")
-    .IsDependentOn("Build")
-    .IsDependentOn("Package")
-    .Does(() => { });
+// Arguments
 
-Task("Build")
-    .IsDependentOn("BuildWindows")
-    .IsDependentOn("BuildLinux")
-    .Does(() => { });
+var _target = Argument("target", "Default");
 
-Task("BuildWindows").Does(() =>
+// PREPARATION
+
+var _buildOutput = "Build";
+var _installerOutput = _buildOutput + "/Installers";
+
+// TASKS
+
+Task("BuildWindows")
+    .WithCriteria(() => IsRunningOnWindows())
+    .Does(() =>
 {
-    if (!IsRunningOnWindows())
-        return;
-    
     MSBuild(
         "Source/Launcher.Windows/Launcher.Windows.csproj",
         configurator => configurator
@@ -24,11 +24,10 @@ Task("BuildWindows").Does(() =>
     );
 });
 
-Task("BuildLinux").Does(() =>
+Task("BuildLinux")
+    .WithCriteria(() => IsRunningOnUnix())
+    .Does(() =>
 {
-    if (!IsRunningOnUnix())
-        return;
-
     XBuild(
         "Source/Launcher.Linux/Launcher.Linux.csproj",
         configurator => configurator
@@ -37,8 +36,56 @@ Task("BuildLinux").Does(() =>
     );
 });
 
+Task("PackageLinux")
+    .IsDependentOn("BuildLinux")
+    .WithCriteria(() => IsRunningOnUnix())
+    .Does(() =>
+{
+    var tempdir = "Temp";
+    CreateDirectory(tempdir);
+
+    var installerdir = _installerOutput + "/Linux";
+    CreateDirectory(installerdir);
+    CleanDirectory(installerdir);
+
+    // Create bundle of binaries
+    Zip(_buildOutput + "/Linux/Release/Launcher", installerdir + "/Launcher.zip");
+
+    // Create .run installer
+
+    var rundir = installerdir + "/run";
+    CreateDirectory(rundir);
+
+    CopyDirectory(_buildOutput + "/Linux/Release/Launcher", rundir + "/HearthstoneMod/Launcher");
+    CopyFileToDirectory("Installers/Linux/hearthstone-mod", rundir);
+    CopyFileToDirectory("Installers/Linux/hearthstone-mod-uninstall", rundir);
+    CopyFileToDirectory("Installers/Linux/hearthstone-mod.desktop", rundir);
+    CopyFileToDirectory("Installers/Linux/postinstall.sh", rundir);
+
+    StartProcess("ThirdParty/makeself/makeself.sh", "--keep-umask " + rundir + " " + installerdir + "/hearthstone-mod.run 'Hearthstone Mod Installer' ./postinstall.sh");
+
+    DeleteDirectory(rundir, true);
+
+    // Create .deb installer
+
+
+});
+
+// TASK TARGETS
+
+Task("Default")
+    .IsDependentOn("Build")
+    .IsDependentOn("Package");
+
+Task("Build")
+    .IsDependentOn("BuildWindows")
+    .IsDependentOn("BuildLinux");
+
 Task("Package")
     .IsDependentOn("Build")
+    .IsDependentOn("PackageLinux")
     .Does(() => { });
 
-RunTarget("Default");
+// EXECUTION
+
+RunTarget(_target);

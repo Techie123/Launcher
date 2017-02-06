@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# Remove launcher / game data
+rm -rf /opt/HearthstoneMod/
+
+# Remove terminal commands
+rm /usr/bin/hearthstone-mod
+rm /usr/bin/hearthstone-mod-uninstall
+
+# Remove application launcher
+rm /usr/share/applications/hearthstone-mod.desktop
