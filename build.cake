@@ -1,8 +1,12 @@
+#addin "Cake.FileHelpers"
+
 // Arguments
 
 var _target = Argument("target", "Default");
 
 // PREPARATION
+
+var Version = "1.0.0.1";
 
 var _buildOutput = "Build";
 var _installerOutput = _buildOutput + "/Installers";
@@ -21,12 +25,16 @@ Task("BuildWindows")
         }
     );
 
+    ReplaceTextInFiles("Source/Launcher/Properties/AssemblyInfo.cs", "1.0.0.0", Version);
+
     MSBuild(
         "Source/Launcher.Windows/Launcher.Windows.csproj",
         configurator => configurator
             .SetConfiguration("Release")
             .SetVerbosity(Verbosity.Minimal)
     );
+
+    ReplaceTextInFiles("Source/Launcher/Properties/AssemblyInfo.cs", Version, "1.0.0.0");
 });
 
 Task("BuildLinux")
@@ -41,12 +49,16 @@ Task("BuildLinux")
         }
     );
 
+    ReplaceTextInFiles("Source/Launcher/Properties/AssemblyInfo.cs", "1.0.0.0", Version);
+
     XBuild(
         "Source/Launcher.Linux/Launcher.Linux.csproj",
         configurator => configurator
             .SetConfiguration("Release")
             .SetVerbosity(Verbosity.Minimal)
     );
+
+    ReplaceTextInFiles("Source/Launcher/Properties/AssemblyInfo.cs", Version, "1.0.0.0");
 });
 
 Task("PackageWindows")
@@ -66,6 +78,7 @@ Task("PackageWindows")
 
     CopyDirectory(_buildOutput + "/Windows/Release/Launcher", datadir + "/Launcher");
     CopyFileToDirectory("Installers/Windows/HearthstoneMod.nsi", installerdir);
+    ReplaceTextInFiles(installerdir + "/HearthstoneMod.nsi", "1.0.0.0", Version);
 
     MakeNSIS(installerdir + "/HearthstoneMod.nsi");
     DeleteFile(installerdir + "/HearthstoneMod.nsi");
@@ -103,6 +116,7 @@ Task("PackageLinux")
 
     CopyDirectory(_buildOutput + "/Linux/Release/Launcher", debdir + "/opt/HearthstoneMod/Launcher");
     CopyDirectory("Installers/Linux/DEBIAN", debdir + "/DEBIAN");
+    ReplaceTextInFiles(debdir + "/DEBIAN/control", "1.0.0.0", Version);
     CreateDirectory(debdir + "/usr/bin/");
     CopyFileToDirectory("Installers/Linux/hearthstone-mod", debdir + "/usr/bin/");
     CreateDirectory(debdir + "/usr/share/applications/");
