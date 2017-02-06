@@ -131,7 +131,7 @@ namespace Launcher
                 line = line.Replace("---", "");
 
                 if (line.StartsWith("# "))
-                    line = "<h1>" + line.Substring(2) + "</h1>";
+                    line = (ulstarted ? "</ul>" : "") + "<h1>" + line.Substring(2) + "</h1>";
                 else if (line.StartsWith("## "))
                 {
                     line = (ulstarted ? "</ul>" : "") + "<h4>" + line.Substring(3) + "</h4>";
@@ -140,8 +140,7 @@ namespace Launcher
                 else if (line.StartsWith("* "))
                 {
                     line = ((!ulstarted) ? "<ul>" : "") + "<li>" + line.Substring(2) + "</li>";
-                    if (!ulstarted)
-                        ulstarted = true;
+                    ulstarted = true;
                 }
                 else if (line.StartsWith("!["))
                 {
