@@ -13,6 +13,14 @@ Task("BuildWindows")
     .WithCriteria(() => IsRunningOnWindows())
     .Does(() =>
 {
+    NuGetRestore(
+        "Source/Launcher.Windows/Launcher.Windows.csproj",
+        new NuGetRestoreSettings
+        {
+            PackagesDirectory = "Source/packages"
+        }
+    );
+
     MSBuild(
         "Source/Launcher.Windows/Launcher.Windows.csproj",
         configurator => configurator
@@ -25,6 +33,14 @@ Task("BuildLinux")
     .WithCriteria(() => IsRunningOnUnix())
     .Does(() =>
 {
+    NuGetRestore(
+        "Source/Launcher.Linux/Launcher.Linux.csproj",
+        new NuGetRestoreSettings
+        {
+            PackagesDirectory = "Source/packages"
+        }
+    );
+
     XBuild(
         "Source/Launcher.Linux/Launcher.Linux.csproj",
         configurator => configurator
@@ -33,14 +49,34 @@ Task("BuildLinux")
     );
 });
 
+Task("PackageWindows")
+    .WithCriteria(() => IsRunningOnWindows())
+    .Does(() =>
+{
+    var installerdir = _installerOutput + "/Windows";
+    CreateDirectory(installerdir);
+    CleanDirectory(installerdir);
+
+    // Create bundle of binaries
+    Zip(_buildOutput + "/Windows/Release/Launcher", installerdir + "/Launcher.zip");
+
+    // Create installer
+    var datadir = installerdir + "/HearthstoneMod";
+    CreateDirectory(datadir);
+
+    CopyDirectory(_buildOutput + "/Windows/Release/Launcher", datadir + "/Launcher");
+    CopyFileToDirectory("Installers/Windows/HearthstoneMod.nsi", installerdir);
+
+    MakeNSIS(installerdir + "/HearthstoneMod.nsi");
+    DeleteFile(installerdir + "/HearthstoneMod.nsi");
+    DeleteDirectory(datadir, true);
+});
+
 Task("PackageLinux")
     .IsDependentOn("BuildLinux")
     .WithCriteria(() => IsRunningOnUnix())
     .Does(() =>
 {
-    var tempdir = "Temp";
-    CreateDirectory(tempdir);
-
     var installerdir = _installerOutput + "/Linux";
     CreateDirectory(installerdir);
     CleanDirectory(installerdir);
@@ -88,8 +124,8 @@ Task("Build")
 
 Task("Package")
     .IsDependentOn("Build")
-    .IsDependentOn("PackageLinux")
-    .Does(() => { });
+    .IsDependentOn("PackageWindows")
+    .IsDependentOn("PackageLinux");
 
 // EXECUTION
 

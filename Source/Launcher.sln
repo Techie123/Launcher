@@ -10,6 +10,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Launcher.Windows", "Launche
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Launcher\Launcher.projitems*{59399bb1-cbfe-4dc5-86ee-c7dc637d0bf1}*SharedItemsImports = 4
 		Launcher\Launcher.projitems*{89490ca4-0ce2-4d4f-a782-149c6a729179}*SharedItemsImports = 13
 		Launcher\Launcher.projitems*{f7d81dfa-a25c-4463-a15c-923f905cf77e}*SharedItemsImports = 4
 	EndGlobalSection
