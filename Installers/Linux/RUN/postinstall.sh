@@ -29,11 +29,6 @@ chmod +x /usr/bin/hearthstone-mod
 cp hearthstone-mod-uninstall /usr/bin/hearthstone-mod-uninstall
 chmod +x /usr/bin/hearthstone-mod-uninstall
 
-# Application icon
-mkdir -p /usr/share/icons/hicolor/256x256/apps
-cp hearthstone-mod.png /usr/share/icons/hicolor/256x256/apps/hearthstone-mod.png
-gtk-update-icon-cache /usr/share/icons/hicolor/ -f &> /dev/null
-
 # Application launcher
 cp hearthstone-mod.desktop /usr/share/applications/hearthstone-mod.desktop
 

@@ -1,6 +1,3 @@
-using System;
-using System.IO;
-
 // Arguments
 
 var _target = Argument("target", "Default");
@@ -52,23 +49,31 @@ Task("PackageLinux")
     Zip(_buildOutput + "/Linux/Release/Launcher", installerdir + "/Launcher.zip");
 
     // Create .run installer
-
     var rundir = installerdir + "/run";
     CreateDirectory(rundir);
 
     CopyDirectory(_buildOutput + "/Linux/Release/Launcher", rundir + "/HearthstoneMod/Launcher");
     CopyFileToDirectory("Installers/Linux/hearthstone-mod", rundir);
-    CopyFileToDirectory("Installers/Linux/hearthstone-mod-uninstall", rundir);
+    CopyFileToDirectory("Installers/Linux/RUN/hearthstone-mod-uninstall", rundir);
     CopyFileToDirectory("Installers/Linux/hearthstone-mod.desktop", rundir);
-    CopyFileToDirectory("Installers/Linux/postinstall.sh", rundir);
+    CopyFileToDirectory("Installers/Linux/RUN/postinstall.sh", rundir);
 
     StartProcess("ThirdParty/makeself/makeself.sh", "--keep-umask " + rundir + " " + installerdir + "/hearthstone-mod.run 'Hearthstone Mod Installer' ./postinstall.sh");
-
     DeleteDirectory(rundir, true);
 
     // Create .deb installer
+    var debdir = installerdir + "/deb";
+    CreateDirectory(debdir);
 
+    CopyDirectory(_buildOutput + "/Linux/Release/Launcher", debdir + "/opt/HearthstoneMod/Launcher");
+    CopyDirectory("Installers/Linux/DEBIAN", debdir + "/DEBIAN");
+    CreateDirectory(debdir + "/usr/bin/");
+    CopyFileToDirectory("Installers/Linux/hearthstone-mod", debdir + "/usr/bin/");
+    CreateDirectory(debdir + "/usr/share/applications/");
+    CopyFileToDirectory("Installers/Linux/hearthstone-mod.desktop", debdir + "/usr/share/applications/");
 
+    StartProcess("dpkg", "--build " + debdir + " " + installerdir + "/hearthstone-mod.deb");
+    DeleteDirectory(debdir, true);
 });
 
 // TASK TARGETS

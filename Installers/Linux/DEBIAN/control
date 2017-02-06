@@ -1,0 +1,7 @@
+Package: hearthstone-mod
+Section: Game
+Architecture: all
+Depends: libgtk-3-0 (>= 3.0.0), gtk-sharp3 (>= 2.99)
+Maintainer: Harry <cra0zy@email.com>
+Description: Hearthstone Mod Launcher
+Version: 1.0.0.0
