@@ -78,7 +78,7 @@ namespace Launcher
             var html = "";
             var changeloglocation = Path.Combine(curdir, CacheLocation, "changelog.txt");
             var changelogtext = "";
-            var changelog = new string[0];
+            var changelog = "";
             var ulstarted = false;
 
             // Read default HTML / CSS / JavaScript
@@ -119,39 +119,11 @@ namespace Launcher
             try
             {
                 if (File.Exists(changeloglocation))
-                    changelog = File.ReadAllLines(changeloglocation);
+                    changelog = File.ReadAllText(changeloglocation);
             }
             catch { }
 
-            // Formate changelog markdown to HTML
-            for (int i = 0; i < changelog.Length; i++)
-            {
-                var line = changelog[i];
-                line = line.Trim(new char[] { ' ', ':' });
-                line = line.Replace("---", "");
-
-                if (line.StartsWith("# "))
-                    line = (ulstarted ? "</ul>" : "") + "<h1>" + line.Substring(2) + "</h1>";
-                else if (line.StartsWith("## "))
-                {
-                    line = (ulstarted ? "</ul>" : "") + "<h4>" + line.Substring(3) + "</h4>";
-                    ulstarted = false;
-                }
-                else if (line.StartsWith("* "))
-                {
-                    line = ((!ulstarted) ? "<ul>" : "") + "<li>" + line.Substring(2) + "</li>";
-                    ulstarted = true;
-                }
-                else if (line.StartsWith("!["))
-                {
-                    var src = line.Remove(line.Length - 1).Split('(')[1];
-                    line = "<img src='" + src + "' />";
-                }
-
-                changelog[i] = line;
-            }
-
-            changelogtext = string.Join("", changelog) + (ulstarted ? "</ul>" : "");
+            changelogtext =  CommonMark.CommonMarkConverter.Convert(changelog);
 
             _status = Status.Ready;
             ReloadPlay(false);
