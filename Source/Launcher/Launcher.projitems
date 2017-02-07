@@ -39,10 +39,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)Data\header-illidan.mp4" />
     <None Include="$(MSBuildThisFileDirectory)Data\button-close.png" />
     <None Include="$(MSBuildThisFileDirectory)Data\button-minimize.png" />
     <None Include="$(MSBuildThisFileDirectory)Data\button-close-hover.png" />
     <None Include="$(MSBuildThisFileDirectory)Data\button-minimize-hover.png" />
+    <None Include="$(MSBuildThisFileDirectory)Data\background.png" />
   </ItemGroup>
 </Project>

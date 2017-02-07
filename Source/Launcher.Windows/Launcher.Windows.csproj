@@ -79,10 +79,6 @@
     <Folder Include="Data\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\Launcher\Data\header-illidan.mp4">
-      <Link>Data\header-illidan.mp4</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="..\Launcher\Data\button-close.png">
       <Link>Data\button-close.png</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -97,6 +93,10 @@
     </Content>
     <Content Include="..\Launcher\Data\button-minimize-hover.png">
       <Link>Data\button-minimize-hover.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Launcher\Data\background.png">
+      <Link>Data\background.png</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
