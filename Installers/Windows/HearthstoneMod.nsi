@@ -84,12 +84,17 @@ Section "Start Menu Shortcuts" S_StartMenu
   CreateShortcut "$SMPROGRAMS\Hearthstone Mod\Uninstall Hearthstone Mod.lnk" "$INSTDIR\Uninstall.exe"
 SectionEnd
 
+Section "Desktop Shortcut" S_Desktop
+  CreateShortcut "$DESKTOP\Hearthstone Mod.lnk" "$INSTDIR\Launcher\Launcher.exe"
+SectionEnd
+
 ;--------------------------------
 ;Descriptions
 
   !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
     !insertmacro MUI_DESCRIPTION_TEXT ${S_GameData} "The main game data."
     !insertmacro MUI_DESCRIPTION_TEXT ${S_StartMenu} "Start menu shortcuts for the game and the uninstaller."
+    !insertmacro MUI_DESCRIPTION_TEXT ${S_Desktop} "Desktop shortcut for the game."
   !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 ;--------------------------------
