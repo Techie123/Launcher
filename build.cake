@@ -6,7 +6,7 @@ var _target = Argument("target", "Default");
 
 // PREPARATION
 
-var Version = "1.0.0.1";
+var Version = "1.0.1.0";
 
 var _buildOutput = "Build";
 var _installerOutput = _buildOutput + "/Installers";
